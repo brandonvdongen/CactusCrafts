@@ -56,3 +56,10 @@ bunch of random nonsense i made ;o
 #    versionRange="[1.18.2,1.19)"
 #    ordering="NONE"
 #    side="BOTH"
+
+[[dependencies.cactuscrafts]]
+modId="create"
+mandatory=true
+versionRange="[0.5.0.h,)"
+ordering="NONE"
+side="BOTH"

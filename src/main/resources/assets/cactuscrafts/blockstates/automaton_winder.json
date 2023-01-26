@@ -1,0 +1,20 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "cactuscrafts:block/automaton_winder/block",
+      "y": 270
+    },
+    "facing=south": {
+      "model": "cactuscrafts:block/automaton_winder/block",
+      "y": 90
+    },
+    "facing=west": {
+      "model": "cactuscrafts:block/automaton_winder/block",
+      "y": 180
+    },
+    "facing=east": {
+      "model": "cactuscrafts:block/automaton_winder/block",
+      "y": 0
+    }
+  }
+}

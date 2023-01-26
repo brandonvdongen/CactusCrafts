@@ -1,5 +1,6 @@
 {
   "item.cactuscrafts.cactus": "Cactus",
+  "item.cactuscrafts.automaton_spawn_egg": "Automaton Spawn Egg",
   "block.cactuscrafts.grid_block": "Grid Block",
   "itemGroup.cactustab": "Cactus Crafts"
 }
