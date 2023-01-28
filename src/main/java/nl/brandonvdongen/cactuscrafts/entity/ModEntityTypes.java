@@ -17,7 +17,7 @@ public class ModEntityTypes {
 
     public static final RegistryObject<EntityType<AutomatonEntity>> AUTOMATON = ENTITY_TYPES.register("automaton",
             ()-> EntityType.Builder.of(AutomatonEntity::new, MobCategory.CREATURE)
-            .sized(1f,1f).build(new ResourceLocation(CactusCrafts.MOD_ID, "automaton").toString()));
+            .sized(.5f,.5f).build(new ResourceLocation(CactusCrafts.MOD_ID, "automaton").toString()));
 
 
     public static void register(IEventBus eventBus){

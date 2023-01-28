@@ -1,6 +1,5 @@
 package nl.brandonvdongen.create.index;
 
-import com.simibubi.create.content.contraptions.base.HalfShaftInstance;
 import com.tterrag.registrate.util.entry.BlockEntityEntry;
 import nl.brandonvdongen.cactuscrafts.CactusCrafts;
 import nl.brandonvdongen.create.blocks.automatonwinder.AutomatonWinderInstance;

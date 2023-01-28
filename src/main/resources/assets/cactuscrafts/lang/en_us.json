@@ -1,6 +1,14 @@
 {
   "item.cactuscrafts.cactus": "Cactus",
-  "item.cactuscrafts.automaton_spawn_egg": "Automaton Spawn Egg",
+
+  "item.cactuscrafts.automaton_item": "Automaton",
+  "item.cactuscrafts.automaton.tooltip.tension": "Time remaining: %s",
+  "item.cactuscrafts.automaton.tooltip.item": "Holding: %s(%s)",
+
   "block.cactuscrafts.grid_block": "Grid Block",
+
+  "item.cactuscrafts.auto_winder": "Auto Winder",
+  "block.cactuscrafts.auto_winder": "Auto Winder",
+
   "itemGroup.cactustab": "Cactus Crafts"
 }

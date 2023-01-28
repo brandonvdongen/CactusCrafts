@@ -1,9 +1,17 @@
 package nl.brandonvdongen.cactuscrafts;
 
 import com.mojang.logging.LogUtils;
+import com.simibubi.create.Create;
+import com.simibubi.create.content.contraptions.fluids.tank.BoilerHeaters;
+import com.simibubi.create.content.curiosities.weapons.BuiltinPotatoProjectileTypes;
+import com.simibubi.create.content.schematics.filtering.SchematicInstances;
+import com.simibubi.create.foundation.advancement.AllAdvancements;
+import com.simibubi.create.foundation.advancement.AllTriggers;
 import com.simibubi.create.foundation.data.CreateRegistrate;
+import com.simibubi.create.foundation.utility.CreateRegistry;
 import com.tterrag.registrate.util.nullness.NonNullSupplier;
 import net.minecraft.client.renderer.entity.EntityRenderers;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.common.MinecraftForge;
@@ -19,12 +27,15 @@ import net.minecraftforge.fml.event.lifecycle.InterModProcessEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import nl.brandonvdongen.cactuscrafts.blocks.ModBlocks;
+import nl.brandonvdongen.cactuscrafts.blocks.entity.ModBlockEntities;
 import nl.brandonvdongen.cactuscrafts.entity.ModEntityTypes;
 import nl.brandonvdongen.cactuscrafts.entity.client.AutomatonRenderer;
 import nl.brandonvdongen.cactuscrafts.item.ModItems;
 import nl.brandonvdongen.cactuscrafts.networking.ModMessages;
+import nl.brandonvdongen.create.blocks.BlockPartials;
 import nl.brandonvdongen.create.index.CreateBlocks;
 import nl.brandonvdongen.create.index.CreateTileEntities;
+import nl.brandonvdongen.create.networking.AllPackets;
 import org.slf4j.Logger;
 
 import java.util.stream.Collectors;
@@ -48,13 +59,20 @@ public class CactusCrafts
 
         ModItems.register(eventBus);
         ModBlocks.register(eventBus);
+        ModBlockEntities.register(eventBus);
         ModEntityTypes.register(eventBus);
 
         CreateBlocks.register();
         CreateTileEntities.register();
+        BlockPartials.init();
 
         // Register ourselves for server and other game events we are interested in
         MinecraftForge.EVENT_BUS.register(this);
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(CactusCrafts::init);
+    }
+
+    public static void init(final FMLCommonSetupEvent event) {
+        AllPackets.registerPackets();
     }
 
     private void clientSetup(final FMLClientSetupEvent event){
@@ -63,13 +81,14 @@ public class CactusCrafts
 
     private void setup(final FMLCommonSetupEvent event)
     {
-        // some preinit code
-        LOGGER.info("HELLO FROM PREINIT");
-        LOGGER.info("DIRT BLOCK >> {}", Blocks.DIRT.getRegistryName());
 
         event.enqueueWork(()-> {
             ModMessages.register();
         });
+    }
+
+    public static ResourceLocation asResource(String path) {
+        return new ResourceLocation(MOD_ID, path);
     }
 
     public static CreateRegistrate registrate() {

@@ -1,7 +1,6 @@
 package nl.brandonvdongen.cactuscrafts.entity.ai.goal.automaton;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.goal.MoveToBlockGoal;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -54,7 +53,7 @@ public class FindWinderGoal extends MoveToBlockGoal {
                 if(blockEntity instanceof AutomatonWinderTileEntity) {
                     AutomatonWinderTileEntity winder = (AutomatonWinderTileEntity)mob.level.getBlockEntity(this.blockPos);
                         mob.setTension(mob.getTension() + (Math.abs(winder.RPS()/8)));
-                        System.out.println(mob.getTension());
+                        //System.out.println(mob.getTension());
                 }
             }
         }
