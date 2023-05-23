@@ -11,6 +11,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
 
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.datafix.fixes.EntityIdFix;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -20,6 +22,7 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -27,6 +30,8 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
+import net.minecraftforge.network.NetworkHooks;
+import nl.brandonvdongen.cactuscrafts.entity.custom.AutomatonEntity;
 import nl.brandonvdongen.create.index.CreateTileEntities;
 import nl.brandonvdongen.create.shapes.CAShapes;
 
@@ -81,6 +86,8 @@ public class AutomatonWinderBlock extends HorizontalKineticBlock implements ITE<
 		return CreateTileEntities.AUTOMATON_WINDER.create(pos, state);
 	}
 
+
+
 	@Override
 	public SpeedLevel getMinimumRequiredSpeedLevel() {
 		return SpeedLevel.SLOW;
@@ -91,7 +98,9 @@ public class AutomatonWinderBlock extends HorizontalKineticBlock implements ITE<
 		if(!pLevel.isClientSide){
 			BlockEntity entity =pLevel.getBlockEntity(pPos);
 			if(entity instanceof AutomatonWinderTileEntity){
-				((AutomatonWinderTileEntity) entity).flap(true);
+				NetworkHooks.openGui((ServerPlayer) pPlayer, (AutomatonWinderTileEntity)entity, pPos);
+			}else{
+				throw new IllegalStateException("Our Container Provider is missing");
 			}
 		}
 		return InteractionResult.sidedSuccess(pLevel.isClientSide());
@@ -108,14 +117,14 @@ public class AutomatonWinderBlock extends HorizontalKineticBlock implements ITE<
 		return state.getValue(HORIZONTAL_FACING);
 	}
 
-	/*
 	@Override
-	public void neighborChanged(BlockState state, Level worldIn, BlockPos pos, Block blockIn, BlockPos fromPos, boolean isMoving) {
-		BlockEntity tileentity = state.hasBlockEntity() ? worldIn.getBlockEntity(pos) : null;
-		if(tileentity != null) {
-			if(tileentity instanceof AutomatonWinderTileEntity) {
-				((AutomatonWinderTileEntity)tileentity).updateCache();
+	public void onRemove(BlockState pState, Level pLevel, BlockPos pPos, BlockState pNewState, boolean pIsMoving) {
+		if(pState.getBlock() != pNewState.getBlock()){
+			BlockEntity blockEntity = pLevel.getBlockEntity(pPos);
+			if(blockEntity instanceof AutomatonWinderTileEntity){
+				((AutomatonWinderTileEntity)blockEntity).drops();
 			}
 		}
-	}*/
+		super.onRemove(pState, pLevel, pPos, pNewState, pIsMoving);
+	}
 }

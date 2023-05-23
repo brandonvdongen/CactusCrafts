@@ -7,8 +7,10 @@
 
   "block.cactuscrafts.grid_block": "Grid Block",
 
-  "item.cactuscrafts.auto_winder": "Auto Winder",
-  "block.cactuscrafts.auto_winder": "Auto Winder",
+  "item.cactuscrafts.automaton_winder": "Auto-Winder",
+  "block.cactuscrafts.automaton_winder": "Auto-Winder",
+  "tooltip.cactuscrafts.automaton_winder.header": "Winder Info:",
+  "tooltip.cactuscrafts.automaton_winder.occupant_info": "Occupant:",
 
   "itemGroup.cactustab": "Cactus Crafts"
 }

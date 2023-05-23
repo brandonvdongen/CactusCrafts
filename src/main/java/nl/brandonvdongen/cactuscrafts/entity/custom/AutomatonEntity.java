@@ -29,7 +29,9 @@ import nl.brandonvdongen.cactuscrafts.CactusCrafts;
 import nl.brandonvdongen.cactuscrafts.blocks.ModBlocks;
 import nl.brandonvdongen.cactuscrafts.entity.ai.goal.automaton.FindWinderGoal;
 import nl.brandonvdongen.cactuscrafts.entity.ai.goal.automaton.UnpoweredGoal;
+import nl.brandonvdongen.cactuscrafts.helpers.NbtHelper;
 import nl.brandonvdongen.cactuscrafts.helpers.SmoothedFloat;
+import nl.brandonvdongen.cactuscrafts.interfaces.ICanPickUpEntity;
 import nl.brandonvdongen.cactuscrafts.item.ModItems;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib3.core.IAnimatable;
@@ -44,12 +46,11 @@ import software.bernie.geckolib3.util.GeckoLibUtil;
 
 import static net.minecraft.util.Mth.lerp;
 
-public class AutomatonEntity extends TamableAnimal implements IAnimatable {
+public class AutomatonEntity extends TamableAnimal implements IAnimatable, ICanPickUpEntity {
 
     private final AnimationFactory factory = GeckoLibUtil.createFactory(this);
 
-    public static final String TENSION_NBT_KEY = CactusCrafts.MOD_ID+":Tension";
-    public static final String ITEM_NBT_KEY = CactusCrafts.MOD_ID+":HeldItem";
+    public static final String TENSION_NBT_KEY = "Tension";
 
     public static final float MAX_TENSION = 36000;
     public SmoothedFloat keyRotation = new SmoothedFloat(0,0.1f);
@@ -228,12 +229,7 @@ public class AutomatonEntity extends TamableAnimal implements IAnimatable {
             if(this.level.isClientSide){return InteractionResult.CONSUME;}
             if(player.getMainHandItem().is(AllItems.WRENCH.get())){
 
-                CompoundTag nbt = this.getNbtData();
-                ItemStack item = new ItemStack(ModItems.AUTOMATON_ITEM.get());
-                item.setTag(nbt);
-                item.setHoverName(this.getCustomName());
-                this.spawnAtLocation(item);
-                this.remove(RemovalReason.DISCARDED);
+                this.spawnAtLocation(PickUpEntity());
                 return InteractionResult.SUCCESS;
             }
             if(this.getMainHandItem().isEmpty()){
@@ -257,31 +253,28 @@ public class AutomatonEntity extends TamableAnimal implements IAnimatable {
     @Override
     public void readAdditionalSaveData(CompoundTag tag){
         super.readAdditionalSaveData(tag);
-        setTension(tag.getFloat("tension"));
-        setSitting(tag.getBoolean("sitting"));
+        setTension(tag.getFloat(TENSION_NBT_KEY));
+        setSitting(tag.getBoolean("Sitting"));
     }
 
     @Override
     public void addAdditionalSaveData(CompoundTag tag){
         super.addAdditionalSaveData(tag);
-        tag.putFloat("tension", this.getTension());
-        tag.putBoolean("sitting", this.isSitting());
-    }
-
-    public CompoundTag getNbtData(){
-        CompoundTag tag = new CompoundTag();
-        tag.put(ITEM_NBT_KEY, this.getMainHandItem().serializeNBT());
-        tag.putFloat(TENSION_NBT_KEY, getTension());
-        return tag;
-    }
-
-    public void setNbtData(CompoundTag tag){
-        setTension(tag.getFloat(TENSION_NBT_KEY));
-        this.setItemInHand(InteractionHand.MAIN_HAND,ItemStack.of(tag.getCompound(ITEM_NBT_KEY)));
+        tag.putFloat(TENSION_NBT_KEY, this.getTension());
+        tag.putBoolean("Sitting", this.isSitting());
     }
 
     @Override
     public AnimationFactory getFactory() {
         return this.factory;
+    }
+
+    @Override
+    public ItemStack PickUpEntity() {
+        ItemStack item = new ItemStack(ModItems.AUTOMATON_ITEM.get());
+        item.setTag(new NbtHelper(CactusCrafts.MOD_ID,this.serializeNBT()).SanitizeEntityNBT().get());
+        item.setHoverName(this.getCustomName());
+        this.remove(RemovalReason.DISCARDED);
+        return item;
     }
 }

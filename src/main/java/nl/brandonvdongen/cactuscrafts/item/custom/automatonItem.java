@@ -1,16 +1,13 @@
 package nl.brandonvdongen.cactuscrafts.item.custom;
 
 
-import com.simibubi.create.content.curiosities.armor.BackTankUtil;
-import com.simibubi.create.foundation.utility.Lang;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.*;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.Item;
@@ -18,15 +15,17 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.NetherPortalBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import nl.brandonvdongen.cactuscrafts.CactusCrafts;
 import nl.brandonvdongen.cactuscrafts.entity.ModEntityTypes;
 import nl.brandonvdongen.cactuscrafts.entity.custom.AutomatonEntity;
+import nl.brandonvdongen.cactuscrafts.interfaces.ICanSpawnEntity;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class automatonItem extends Item {
+public class automatonItem extends Item implements ICanSpawnEntity<AutomatonEntity> {
 
     public automatonItem(Properties pProperties) {
         super(pProperties);
@@ -61,7 +60,11 @@ public class automatonItem extends Item {
 
             pTooltipComponents.add(new TranslatableComponent("item." + CactusCrafts.MOD_ID + ".automaton.tooltip.tension", new TextComponent(timeString)).withStyle(ChatFormatting.DARK_GRAY));
 
-            ItemStack item = ItemStack.of(pStack.getTag().getCompound(AutomatonEntity.ITEM_NBT_KEY));
+
+            ListTag heldItems = pStack.getTag().getList("HandItems", Tag.TAG_COMPOUND);
+            CompoundTag mainHandNbt = heldItems.getCompound(0);
+
+            ItemStack item = ItemStack.of(mainHandNbt);
             if(!item.isEmpty()) {
                 pTooltipComponents.add(new TranslatableComponent("item." + CactusCrafts.MOD_ID + ".automaton.tooltip.item", new TextComponent(item.getHoverName().getString()), new TextComponent(Integer.toString(item.getCount()))).withStyle(ChatFormatting.DARK_GRAY));
             }
@@ -76,26 +79,33 @@ public class automatonItem extends Item {
         if(context.getLevel().isClientSide)return InteractionResult.SUCCESS;
 
         Level level = context.getLevel();
-        ItemStack itemstack = context.getItemInHand();
         BlockPos blockpos = context.getClickedPos();
         Direction direction = context.getClickedFace();
         BlockState blockstate = level.getBlockState(blockpos);
-        BlockPos blockpos1;
+        BlockPos spawnPos;
         if (blockstate.getCollisionShape(level, blockpos).isEmpty()) {
-            blockpos1 = blockpos;
+            spawnPos = blockpos;
         } else {
-            blockpos1 = blockpos.relative(direction);
+            spawnPos = blockpos.relative(direction);
         }
-        var entity = ModEntityTypes.AUTOMATON.get().create(context.getLevel());
-        entity.setPos(blockpos1.getX(),blockpos1.getY(), blockpos1.getZ());
-        if(context.getItemInHand().getTag() != null)entity.setNbtData(context.getItemInHand().getTag());
-        if(context.getItemInHand().hasCustomHoverName())entity.setCustomName(context.getItemInHand().getHoverName());
-        if(context.getPlayer() != null)entity.tame(context.getPlayer());
 
-        context.getLevel().addFreshEntity(entity);
-        context.getItemInHand().shrink(1);
+        AutomatonEntity entity = SpawnEntityFromItem(context.getItemInHand(), level, spawnPos.getX()+.5f, spawnPos.getY(), spawnPos.getZ()+.5f);
+        if(context.getPlayer() != null)entity.tame(context.getPlayer());
         return InteractionResult.SUCCESS;
     }
 
 
+
+    public AutomatonEntity SpawnEntityFromItem(ItemStack item, Level level, float x, float y, float z) {
+        return SpawnEntityFromItem(item, level, new BlockPos(x,y,z));
+    }
+    public AutomatonEntity SpawnEntityFromItem(ItemStack item, Level level, BlockPos pos) {
+        var entity = ModEntityTypes.AUTOMATON.get().create(level);
+        if(item.getTag() != null)entity.deserializeNBT(item.getTag());
+        if(item.hasCustomHoverName())entity.setCustomName(item.getHoverName());
+        entity.setPos(pos.getX(),pos.getY(),pos.getZ());
+        level.addFreshEntity(entity);
+        item.shrink(1);
+        return entity;
+    }
 }

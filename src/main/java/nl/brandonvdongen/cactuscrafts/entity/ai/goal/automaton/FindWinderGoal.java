@@ -23,8 +23,7 @@ public class FindWinderGoal extends MoveToBlockGoal {
     @Override
     public boolean canUse() {
         if(!(this.mob.getTension() < AutomatonEntity.MAX_TENSION * 0.2f))return false;
-        if(!this.findNearestBlock())return false;
-        return true;
+        return this.findNearestBlock();
     }
 
     @Override
@@ -35,8 +34,14 @@ public class FindWinderGoal extends MoveToBlockGoal {
     @Override
     protected boolean isValidTarget(LevelReader pLevel, BlockPos pPos) {
         if(pPos == null)return false;
-        BlockState blockstate = pLevel.getBlockState(pPos);
-        return blockstate.is(CreateBlocks.AUTOMATON_WINDER.get());
+
+        BlockEntity be = pLevel.getBlockEntity(pPos);
+        boolean canEnter = false;
+        if(be instanceof AutomatonWinderTileEntity) {
+            AutomatonWinderTileEntity entity = (AutomatonWinderTileEntity) pLevel.getBlockEntity(pPos);
+            canEnter = entity.canEnter();
+        }
+        return canEnter;
     }
 
     @Override
@@ -52,7 +57,10 @@ public class FindWinderGoal extends MoveToBlockGoal {
                 BlockEntity blockEntity = mob.level.getBlockEntity(this.blockPos);
                 if(blockEntity instanceof AutomatonWinderTileEntity) {
                     AutomatonWinderTileEntity winder = (AutomatonWinderTileEntity)mob.level.getBlockEntity(this.blockPos);
-                        mob.setTension(mob.getTension() + (Math.abs(winder.RPS()/8)));
+                        //mob.setTension(mob.getTension() + (Math.abs(winder.RPS()/8)));
+                        if(winder.canEnter()) {
+                         winder.enter(mob);
+                        }
                         //System.out.println(mob.getTension());
                 }
             }
